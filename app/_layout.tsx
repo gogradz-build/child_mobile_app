@@ -4,6 +4,7 @@ import { SplashScreen, Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import 'react-native-reanimated';
 
+import { MissionProvider } from '@/context/MissionContext';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { useCallback, useEffect } from 'react';
 
@@ -38,9 +39,6 @@ export default function RootLayout() {
 
      useEffect(() => {
         if (fontsLoaded) {
-            (Text as unknown as { defaultProps: { style?: object } }).defaultProps = {
-                style: {fontFamily: 'Poppins-Regular'},
-            };
             SplashScreen.hideAsync();
         }
     }, [fontsLoaded]);
@@ -48,14 +46,25 @@ export default function RootLayout() {
         onLayoutRootView();
     }, [fontsLoaded, onLayoutRootView]);
 
+    // Add error boundary for debugging
+    if (!fontsLoaded) {
+        return null; // Keep splash screen visible
+    }
    
   return (
-     <ThemeProvider value={colorScheme === 'light' ? DarkTheme : DefaultTheme}>
-      <Stack screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="(tabs)" />
-        <Stack.Screen name="+not-found" />
-      </Stack>
-      <StatusBar style="auto" />
-    </ThemeProvider>
+    <MissionProvider>
+      <ThemeProvider value={colorScheme === "light" ? DarkTheme : DefaultTheme}>
+        <StatusBar style="dark" hidden={false} translucent={true}  />
+        <Stack 
+          screenOptions={{ 
+            headerShown: false
+          }}
+        >
+          <Stack.Screen name="index" />
+          <Stack.Screen name="home" />
+          <Stack.Screen name="+not-found" />
+        </Stack>
+      </ThemeProvider>
+    </MissionProvider>
   );
 }
