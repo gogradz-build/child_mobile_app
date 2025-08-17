@@ -3,7 +3,7 @@ import { useRouter } from 'expo-router';
 import React, { useEffect } from 'react';
 import { Dimensions, StyleSheet, Text, View } from 'react-native';
 import * as Animatable from 'react-native-animatable';
-import cover from '../assets/images/cover.png';
+const cover = require('../assets/images/cover.png');
 
 const { width, height } = Dimensions.get('window');
 
@@ -78,6 +78,6 @@ const styles = StyleSheet.create({
     height: 265,
     objectFit: 'cover',
     resizeMode: 'contain',
-    marginBottom: 20,
+    paddingBottom: 20,
   },
 });

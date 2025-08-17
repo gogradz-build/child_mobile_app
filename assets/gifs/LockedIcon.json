@@ -1,0 +1,153 @@
+[{
+  "version": "1.0",
+  "image": {
+    "name": "upload/5716368b9bd34ae8947f7e8fafbd5611638ea8a2-p.png[0]",
+    "baseName": "5716368b9bd34ae8947f7e8fafbd5611638ea8a2-p.png",
+    "format": "PNG",
+    "formatDescription": "PNG",
+    "mimeType": "image/png",
+    "class": "DirectClass",
+    "geometry": {
+      "width": 67,
+      "height": 105,
+      "x": 0,
+      "y": 0
+    },
+    "units": "Undefined",
+    "type": "PaletteAlpha",
+    "baseType": "Undefined",
+    "endianness": "Undefined",
+    "colorspace": "sRGB",
+    "depth": 8,
+    "baseDepth": 8,
+    "channelDepth": {
+      "alpha": 1,
+      "red": 8,
+      "green": 8,
+      "blue": 1
+    },
+    "pixels": 28140,
+    "imageStatistics": {
+      "Overall": {
+        "min": 0,
+        "max": 255,
+        "mean": 128.59,
+        "median": 162.25,
+        "standardDeviation": 94.282,
+        "kurtosis": -1.7628,
+        "skewness": -0.034875,
+        "entropy": 0.70037
+      }
+    },
+    "channelStatistics": {
+      "alpha": {
+        "min": 0,
+        "max": 255,
+        "mean": 129.66,
+        "median": 255,
+        "standardDeviation": 127.49,
+        "kurtosis": -1.9991,
+        "skewness": -0.033828,
+        "entropy": 0.99979
+      },
+      "red": {
+        "min": 0,
+        "max": 253,
+        "mean": 67.022,
+        "median": 68,
+        "standardDeviation": 84.594,
+        "kurtosis": 0.18408,
+        "skewness": 1.1738,
+        "entropy": 0.58826
+      },
+      "green": {
+        "min": 113,
+        "max": 255,
+        "mean": 209.58,
+        "median": 246,
+        "standardDeviation": 49.667,
+        "kurtosis": -1.4562,
+        "skewness": -0.42638,
+        "entropy": 0.63501
+      },
+      "blue": {
+        "min": 0,
+        "max": 254,
+        "mean": 108.11,
+        "median": 80,
+        "standardDeviation": 115.38,
+        "kurtosis": -1.8129,
+        "skewness": 0.27096,
+        "entropy": 0.57843
+      }
+    },
+    "alpha": "#00FF0000",
+    "renderingIntent": "Perceptual",
+    "gamma": 0.45455,
+    "chromaticity": {
+      "redPrimary": {
+        "x": 0.64,
+        "y": 0.33
+      },
+      "greenPrimary": {
+        "x": 0.3,
+        "y": 0.6
+      },
+      "bluePrimary": {
+        "x": 0.15,
+        "y": 0.06
+      },
+      "whitePrimary": {
+        "x": 0.3127,
+        "y": 0.329
+      }
+    },
+    "matteColor": "#BDBDBD",
+    "backgroundColor": "#FFFFFF",
+    "borderColor": "#DFDFDF",
+    "transparentColor": "#00000000",
+    "interlace": "None",
+    "intensity": "Undefined",
+    "compose": "Over",
+    "pageGeometry": {
+      "width": 150,
+      "height": 150,
+      "x": 42,
+      "y": 22
+    },
+    "originGeometry": "+42+22",
+    "dispose": "Undefined",
+    "iterations": 0,
+    "compression": "Zip",
+    "orientation": "Undefined",
+    "properties": {
+      "date:create": "2025-08-17T14:46:55+00:00",
+      "date:modify": "2025-08-17T14:46:55+00:00",
+      "date:timestamp": "2025-08-17T14:46:55+00:00",
+      "png:bKGD": "chunk was found (see Background color, above)",
+      "png:caNv": "width=150, height=150, x_offset=42, y_offset=22",
+      "png:cHRM": "chunk was found (see Chromaticity, above)",
+      "png:gAMA": "gamma=0.45455 (See Gamma, above)",
+      "png:IHDR.bit-depth-orig": "8",
+      "png:IHDR.bit_depth": "8",
+      "png:IHDR.color-type-orig": "3",
+      "png:IHDR.color_type": "3 (Indexed)",
+      "png:IHDR.interlace_method": "0 (Not interlaced)",
+      "png:IHDR.width,height": "67, 105",
+      "png:oFFs": "x_off=42, y_off=22",
+      "png:PLTE.number_colors": "159",
+      "png:sRGB": "intent=0 (Perceptual Intent)",
+      "png:text": "2 tEXt/zTXt/iTXt chunks were found",
+      "png:tIME": "2025-08-17T16:46:52Z",
+      "png:tRNS": "chunk was found",
+      "signature": "4d064d66b3d52720040e8cece2815ee634556a70f8d8579ac0e9450af7e8c4d6"
+    },
+    "tainted": false,
+    "filesize": "2764B",
+    "numberPixels": "7035",
+    "pixelsPerSecond": "696.98KB",
+    "userTime": "0.000u",
+    "elapsedTime": "0:01.010",
+    "version": "ImageMagick 7.1.0-52 Q8 x86 04ee6ce:20221106 https://imagemagick.org"
+  }
+}]
