@@ -3,6 +3,7 @@ import { useRouter } from 'expo-router';
 import React, { useEffect } from 'react';
 import { Dimensions, StyleSheet, Text, View } from 'react-native';
 import * as Animatable from 'react-native-animatable';
+import { SafeAreaView } from 'react-native-safe-area-context';
 const cover = require('../assets/images/cover.png');
 
 const { width, height } = Dimensions.get('window');
@@ -20,6 +21,7 @@ const Splash = () => {
   }, []);
 
   return (
+    <SafeAreaView style={{ flex: 1 }}>
     <LinearGradient
       colors={['#FFDEE9', '#B5FFFC']} 
       start={{ x: 0, y: 0 }}
@@ -49,6 +51,7 @@ const Splash = () => {
         ))}
       </View>
     </LinearGradient>
+    </SafeAreaView>
   );
 };
 
