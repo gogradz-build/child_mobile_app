@@ -68,7 +68,7 @@ const styles = StyleSheet.create({
   welcomeText: {
     fontFamily: 'Poppins-Regular',
     fontSize: 32,
-    color: '#FFDBAF',
+    color: '#FFD369',
   },
   text: {
     fontSize: 16,

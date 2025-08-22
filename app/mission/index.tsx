@@ -1,5 +1,5 @@
 import FooterButton from '@/components/FooterButton';
-import { useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useMemo, useRef, useState } from 'react';
 import { Dimensions, Image, PanResponder, StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -44,6 +44,7 @@ const index = () => {
 
   const currentStroke = useRef<Stroke | null>(null);
   const colors = ["#111827", "#F59E0B", "#ED7E2D", "#10B981", "#3B82F6"];
+  const router = useRouter();
   
   const panResponder = useRef(
     PanResponder.create({
@@ -89,11 +90,11 @@ const index = () => {
 
   const handleColorSelect = (selectedColor: string) => {
     setColor(selectedColor);
-    setIsEraser(false); // Turn off eraser when selecting a color
+    setIsEraser(false); 
     setIsColorSelect(false);
   };
 
-  // Remove the handleEraseToggle function since FooterButton will handle this directly
+  
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -140,7 +141,7 @@ const index = () => {
               ))}
             </Svg>
           </View>
-          
+
           <View style={styles.letterContainer}>
             <Text style={styles.mainletter}>{letter}</Text>
             <Text style={styles.secondset}>LET'S WRITE</Text>
@@ -156,12 +157,12 @@ const index = () => {
                       <TouchableOpacity
                         key={c}
                         style={[
-                          styles.colorBall, 
-                          { 
+                          styles.colorBall,
+                          {
                             backgroundColor: c,
-                            borderColor: color === c ? '#000' : '#ccc',
+                            borderColor: color === c ? "#000" : "#ccc",
                             borderWidth: color === c ? 3 : 1,
-                          }
+                          },
                         ]}
                         onPress={() => handleColorSelect(c)}
                       />
@@ -171,7 +172,17 @@ const index = () => {
               </TouchableWithoutFeedback>
             </View>
           )}
-
+          {/* Test */}
+          <TouchableOpacity
+            onPress={() =>
+              router.push({
+                pathname: "/mission/voice",
+                params: { letter },
+              })
+            }
+          >
+            <Text>Next</Text>
+          </TouchableOpacity>
           <View style={styles.footerContainer}>
             <FooterButton
               setMute={setMute}
@@ -264,10 +275,15 @@ const styles = StyleSheet.create({
   },
   footerContainer: {
     position: 'relative',
+    width:'100%',
+    display:'flex',
+    justifyContent:'center',
+    alignContent:'center',
+    alignItems:'center'
   },
   colorOverlay: {
     position: "absolute",
-    bottom: 70, // Position above the footer button
+    bottom: 70, 
     left: 0,
     right: 0,
     justifyContent: "center",

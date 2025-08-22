@@ -17,7 +17,7 @@ const index = () => {
   const [mute,setMute] = React.useState(false);
 
   // Create audio players using the new expo-audio hooks
-  const homeAudioPlayer = useAudioPlayer(require("../../assets/sounds/homeAudio.wav"));
+  const homeAudioPlayer = useAudioPlayer(require("../../assets/sounds/alphabetsong.mp3"));
   const lockAudioPlayer = useAudioPlayer(require("../../assets/sounds/lock.wav"));
   const router = useRouter();
 

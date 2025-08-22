@@ -5,7 +5,7 @@ import MuteIcon from '@/assets/icons/MuteIcon'
 import Paint from '@/assets/icons/PaintBucket'
 import StaticIcon from '@/assets/icons/VolumeIcon'
 import { usePathname, useRouter } from 'expo-router'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { StyleSheet, TouchableOpacity, View } from 'react-native'
 
 interface FooterButtonProps {
@@ -30,9 +30,17 @@ const FooterButton = ({
     const router = useRouter();
     const pathname = usePathname();
     const isMissionPage = pathname.includes('/mission') || pathname.includes('/drawing') || pathname.includes('/index');
-    const colorDisable = false; // Enable for testing - change back to !isMissionPage after testing
-    const eraseDisable = false; // Enable for testing - change back to !isMissionPage after testing
-
+    const [colorDisable,setColorDisable] = useState(true);
+    const [eraseDisable,setEraceDisable] = useState(true); 
+    useEffect(()=>{
+        if (isMissionPage) {
+          setColorDisable(false);
+          setEraceDisable(false);
+        } else {
+          setColorDisable(true);
+          setEraceDisable(true);
+        }
+    },[isMissionPage]);
     const handleColorPress = () => {
         if (!colorDisable) {
             setIsColorSelect((prev: boolean) => !prev); // Toggle color palette
@@ -106,7 +114,7 @@ export default FooterButton
 
 const styles = StyleSheet.create({
     bttn: {
-        backgroundColor: "#FFB963",
+        backgroundColor: 'rgba(255,185,99,0.3)',
         display: "flex",
         flexDirection: "row",
         gap: 8,
