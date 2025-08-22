@@ -1,11 +1,8 @@
-import EraceIcon from '@/assets/icons/EraseIcon';
-import HomeIcon from '@/assets/icons/HomeIcon';
-import StaticHeartIcon from '@/assets/icons/MeterIcon';
-import Paint from '@/assets/icons/PaintBucket';
-import StaticIcon from '@/assets/icons/VolumeIcon';
+import FooterButton from '@/components/FooterButton';
 import { MissionContext } from '@/context/MissionContext';
-import { Audio } from "expo-av";
-import React, { useContext, useEffect, useRef, useState } from 'react';
+import { useAudioPlayer } from "expo-audio";
+import { useRouter } from 'expo-router';
+import React, { useContext, useEffect, useState } from 'react';
 import { FlatList, Image, Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import * as Animatable from 'react-native-animatable';
 
@@ -17,10 +14,12 @@ const index = () => {
   const [localLoading, setLocalLoading] = useState(true);
   const isUnlock = (index: number) => missions[index]?.unlocked;
   const [notValidDisplay, setNotValidDisplay] = React.useState(false);
+  const [mute,setMute] = React.useState(false);
 
-  
-  const homeSound = useRef<Audio.Sound | null>(null);
-  const lockSound = useRef<Audio.Sound | null>(null);
+  // Create audio players using the new expo-audio hooks
+  const homeAudioPlayer = useAudioPlayer(require("../../assets/sounds/alphabetsong.mp3"));
+  const lockAudioPlayer = useAudioPlayer(require("../../assets/sounds/lock.wav"));
+  const router = useRouter();
 
   useEffect(() => {
     if (!isLoading && missions.length > 0) {
@@ -37,106 +36,80 @@ const index = () => {
     }
   }, [notValidDisplay]);
 
-  
-  interface SoundRef {
-    current: Audio.Sound | null;
-  }
+  // Play home sound on component mount
+  useEffect(() => {
+    playHomeSound();
 
-  const stopAndUnloadSound = async (soundRef: SoundRef): Promise<void> => {
-    try {
-      if (soundRef.current) {
-        await soundRef.current.stopAsync();
-        await soundRef.current.unloadAsync();
-        soundRef.current = null;
-      }
-    } catch (error) {
-      console.warn("Error stopping sound:", error);
+    // Cleanup function
+    return () => {
+      // Audio players are automatically cleaned up
+    };
+  }, []);
+
+  useEffect(() => {
+    if (mute) {
+      homeAudioPlayer.pause();
+      homeAudioPlayer.seekTo(0);
+      lockAudioPlayer.pause();
+      lockAudioPlayer.seekTo(0);
     }
-  };
+    else{
+      homeAudioPlayer.play();
+    }
+   
+  }, [mute]);
 
-  
-  const stopAllSounds = async () => {
-    await stopAndUnloadSound(homeSound);
-    await stopAndUnloadSound(lockSound);
-  };
-
-  
-  const playHomeSound = async () => {
+  const playHomeSound = () => {
     try {
-      
-      await stopAllSounds();
+      // Stop lock sound if playing
+      if (lockAudioPlayer.playing) {
+        lockAudioPlayer.pause();
+        lockAudioPlayer.seekTo(0);
+      }
 
-      const { sound } = await Audio.Sound.createAsync(
-        require("../../assets/sounds/homeAudio.wav")
-      );
-      
-      homeSound.current = sound;
-      await sound.playAsync();
-
-      
-      sound.setOnPlaybackStatusUpdate((status) => {
-        if ('didJustFinish' in status && status.didJustFinish) {
-          sound.unloadAsync();
-          homeSound.current = null;
-        }
-      });
+      // Play home sound
+      homeAudioPlayer.play();
     } catch (error) {
       console.warn("Error playing home sound:", error);
     }
   };
 
-  
-  const playLockSound = async () => {
+  const playLockSound = () => {
     try {
       
-      await stopAndUnloadSound(homeSound);
-
-      const { sound } = await Audio.Sound.createAsync(
-        require("../../assets/sounds/lock.wav") 
-      );
+      if (homeAudioPlayer.playing) {
+        homeAudioPlayer.pause();
+        homeAudioPlayer.seekTo(0);
+      }
       
-      lockSound.current = sound;
-      await sound.playAsync();
-
       
-      sound.setOnPlaybackStatusUpdate((status) => {
-        if ('didJustFinish' in status && status.didJustFinish) {
-          sound.unloadAsync();
-          lockSound.current = null;
-        }
-      });
+      lockAudioPlayer.play();
     } catch (error) {
       console.warn("Error playing lock sound:", error);
     }
   };
-
-  
-  useEffect(() => {
-    playHomeSound();
-    
-   
-    return () => {
-      stopAllSounds();
-    };
-  }, []);
 
   const letters = Array.from({ length: 26 }, (_, i) => ({
     id: `m${i}`,
     letter: String.fromCharCode(65 + i),
   }));
 
-  const handlePress = async (id: string, unlocked: boolean) => {
+  const handlePress = (id: string, unlocked: boolean,letter:string) => {
     if (unlocked) {
-      
       console.log(`Mission ${id} selected`);
+      homeAudioPlayer.pause();
+      homeAudioPlayer.seekTo(0);
+      router.push({
+        pathname: "./mission",
+        params: { letter },
+      });
     } else {
-      
-      await playLockSound();
+      playLockSound();
       setNotValidDisplay(true);
     }
   };
 
-  
+  // Loading state
   if (isLoading || localLoading) {
     return (
       <View style={[styles.container, { justifyContent: 'center' }]}>
@@ -145,7 +118,7 @@ const index = () => {
     );
   }
 
-  
+  // Error state
   if (missions.length === 0) {
     return (
       <View style={[styles.container, { justifyContent: 'center' }]}>
@@ -154,6 +127,8 @@ const index = () => {
       </View>
     );
   }
+
+  
 
   return (
     <View style={styles.container}>
@@ -165,9 +140,10 @@ const index = () => {
         keyExtractor={(item) => item.id}
         renderItem={({ item, index }) => {
           const unlocked = isUnlock(index);
+
           return (
             <TouchableOpacity
-              onPress={() => handlePress(item.id, unlocked)}
+              onPress={() => handlePress(item.id, unlocked,item.letter)}
               style={styles.textContainer}
             >
               <Text
@@ -183,25 +159,8 @@ const index = () => {
         }}
       />
       <Image source={cat} />
-      <View style={styles.bttn}>
-        <TouchableOpacity>
-          <HomeIcon size={32} color="#E0681D" />
-        </TouchableOpacity>
-        <TouchableOpacity>
-          <Paint size={32} color="#E0681D" />
-        </TouchableOpacity>
-        <TouchableOpacity>
-          <EraceIcon size={32} color="#E0681D" />
-        </TouchableOpacity>
-        <TouchableOpacity>
-          <StaticHeartIcon size={32} color="#E0681D" />
-        </TouchableOpacity>
-        <TouchableOpacity>
-          <StaticIcon size={32} color="#E0681D" />
-        </TouchableOpacity>
-      </View>
-      
-      <Modal visible={notValidDisplay} transparent={true} animationType="slide">
+      <FooterButton setMute={setMute} mute={mute}/>
+      <Modal visible={notValidDisplay} transparent={true} animationType="slide" >
         <View style={styles.modalBackground}>
           <View style={styles.modalContent}>
             <Animatable.Image
@@ -287,7 +246,7 @@ const styles = StyleSheet.create({
   modalContent: {
     width: 250,
     padding: 20,
-    backgroundColor: '#fff',
+    backgroundColor: '#FF8C42',
     borderRadius: 10,
     alignItems: 'center',
   },
