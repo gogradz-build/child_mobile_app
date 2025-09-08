@@ -1,59 +1,74 @@
 import ProgressBar from '@/components/SimpleProgressBar';
+import { useMarks } from '@/context/MarksContext';
 import { useRouter } from 'expo-router';
-import React from 'react';
-import { Image, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import * as React from 'react';
+import { Image, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+
 const cover = require('../../assets/images/undrawfamily.png');
-const index = () => {
- const router = useRouter();
+
+const Dashboard = () => {
+  const router = useRouter();
+  const { marks } = useMarks();
+
+  // All letters A-Z
+  const lessons = Array.from({ length: 26 }, (_, i) => String.fromCharCode(65 + i));
+
+  const getLessonProgress = (letter: string) => {
+    const letterMarks = marks.filter(m => m.letter === letter);
+    if (!letterMarks.length) return 0;
+
+    const totalScore = letterMarks.reduce((acc, m) => acc + (m.score || 0), 0);
+    const maxTotal = letterMarks.reduce((acc, m) => acc + (m.maxScore || 0), 0);
+    if (!maxTotal) return 0;
+
+    const percent = Math.round((totalScore / maxTotal) * 100);
+    return percent > 100 ? 100 : percent;
+  };
+
+  // Total progress based on completed lessons
+  const completedLessons = lessons.filter(letter => getLessonProgress(letter) > 0).length;
+  const totalPercent = Math.round((completedLessons / lessons.length) * 100);
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.letterContainer}>
         <Text style={styles.secondset}>PROGRESS</Text>
-        <Image
-          source={cover}
-          style={{ width: 200, height: 200, resizeMode: "contain" }}
-        />
+        <Image source={cover} style={{ width: 200, height: 200, resizeMode: 'contain' }} />
         <View style={styles.contentCard}>
-          <ProgressBar />
-          <View
-            style={{
-              display: "flex",
-              flexDirection: "row",
-              justifyContent: "space-between",
-              width: 248,
-            }}
-          >
-            <Text style={styles.resultText}>Lesson 1</Text>
-            <Text style={styles.resultText}>78%</Text>
-          </View>
-          <View
-            style={{
-              display: "flex",
-              flexDirection: "row",
-              justifyContent: "space-between",
-              width: 248,
-            }}
-          >
-            <Text style={styles.resultText}>Lesson 2</Text>
-            <Text style={styles.resultText}>78%</Text>
-          </View>
-          <View
-            style={{
-              display: "flex",
-              flexDirection: "row",
-              justifyContent: "space-between",
-              width: 248,
-              marginBottom:16,
-            }}
-          >
-            <Text style={styles.resultText}>Lesson 3</Text>
-            <Text style={styles.resultText}>78%</Text>
-          </View>
+          {/* Total progress bar based on lessons completed */}
+          <ProgressBar progress={totalPercent > 100 ? 1 : totalPercent } />
+
+          {/* <Text style={[styles.resultText, { fontSize: 20, marginVertical: 8 }]}>
+            Total Progress: {totalPercent}%
+          </Text> */}
+
+          <ScrollView style={{ maxHeight: 240, width: '100%' }}>
+            {lessons.map((letter, idx) => {
+              const percent = getLessonProgress(letter);
+              return (
+                <View
+                  key={letter}
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                    width: 248,
+                    marginBottom: idx === lessons.length - 1 ? 16 : 4,
+                    alignSelf: 'center',
+                  }}
+                >
+                  <Text style={styles.resultText}>Lesson {letter}</Text>
+                  <Text style={styles.resultText}>{percent}%</Text>
+                </View>
+              );
+            })}
+          </ScrollView>
         </View>
+
         <View style={styles.footerContainer}>
           <TouchableOpacity
             style={styles.finish}
-            onPress={() => router.push("/home")}
+            onPress={() => router.push('/home')}
           >
             <Text style={styles.btnText}>Back to Lessons</Text>
           </TouchableOpacity>
@@ -61,9 +76,10 @@ const index = () => {
       </View>
     </SafeAreaView>
   );
-}
+};
 
-export default index
+export default Dashboard;
+
 const styles = StyleSheet.create({
   container:{
     display:'flex',
@@ -100,7 +116,8 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.15,
     shadowRadius: 8,
     elevation: 4,
-    alignItems:'center'
+    alignItems:'center',
+    paddingTop:16
   },
   resultText:{
     color:'#ACA6A6',
@@ -130,4 +147,4 @@ const styles = StyleSheet.create({
     fontSize:16,
     color:'#E0681D'
   },
-})
+});

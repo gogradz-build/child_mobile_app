@@ -4,6 +4,7 @@ import { SplashScreen, Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import 'react-native-reanimated';
 
+import { MarksProvider } from '@/context/MarksContext';
 import { MissionProvider } from '@/context/MissionContext';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { useCallback, useEffect } from 'react';
@@ -53,6 +54,7 @@ export default function RootLayout() {
    
   return (
     <MissionProvider>
+      <MarksProvider>
       <ThemeProvider value={colorScheme === "light" ? DarkTheme : DefaultTheme}>
         <StatusBar style="dark" hidden={false} translucent={true}  />
         <Stack 
@@ -65,6 +67,7 @@ export default function RootLayout() {
           <Stack.Screen name="+not-found" />
         </Stack>
       </ThemeProvider>
+      </MarksProvider>
     </MissionProvider>
   );
 }

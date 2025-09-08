@@ -1,0 +1,84 @@
+{
+  "format": "graph-model",
+  "generatedBy": "TensorFlow.js Converter v3.18.0",
+  "convertedBy": "TensorFlow.js Converter",
+  "modelTopology": {
+    "node": [
+      {
+        "name": "input",
+        "op": "Placeholder",
+        "attr": {
+          "dtype": {
+            "type": "DT_FLOAT"
+          },
+          "shape": {
+            "shape": {
+              "dim": [
+                {
+                  "size": "1"
+                },
+                {
+                  "size": "28"
+                },
+                {
+                  "size": "28"
+                },
+                {
+                  "size": "1"
+                }
+              ]
+            }
+          }
+        }
+      },
+      {
+        "name": "output",
+        "op": "Softmax",
+        "input": ["dense/MatMul"],
+        "attr": {
+          "T": {
+            "type": "DT_FLOAT"
+          }
+        }
+      }
+    ],
+    "library": {}
+  },
+  "weightsManifest": [
+    {
+      "paths": ["weights.bin"],
+      "weights": [
+        {
+          "name": "conv2d/kernel",
+          "shape": [3, 3, 1, 32],
+          "dtype": "float32"
+        },
+        {
+          "name": "conv2d/bias",
+          "shape": [32],
+          "dtype": "float32"
+        },
+        {
+          "name": "conv2d_1/kernel",
+          "shape": [3, 3, 32, 64],
+          "dtype": "float32"
+        },
+        {
+          "name": "conv2d_1/bias",
+          "shape": [64],
+          "dtype": "float32"
+        },
+        {
+          "name": "dense/kernel",
+          "shape": [3136, 26],
+          "dtype": "float32"
+        },
+        {
+          "name": "dense/bias",
+          "shape": [26],
+          "dtype": "float32"
+        }
+      ]
+    }
+  ]
+}
