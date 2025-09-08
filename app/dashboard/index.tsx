@@ -17,18 +17,20 @@ const Dashboard = () => {
     const letterMarks = marks.filter(m => m.letter === letter);
     if (!letterMarks.length) return 0;
 
-    const totalScore = letterMarks.reduce((acc, m) => acc + (m.score || 0), 0);
-    const maxTotal = letterMarks.reduce((acc, m) => acc + (m.maxScore || 0), 0);
-    if (!maxTotal) return 0;
+    const completedMissions = letterMarks.filter(m => m.completed).length;
+    const totalMissions = 2; // Each letter has 2 missions: draw + voice
 
-    const percent = Math.round((totalScore / maxTotal) * 100);
+    const percent = Math.round((completedMissions / totalMissions) * 100);
     return percent > 100 ? 100 : percent;
   };
 
   // Total progress based on completed lessons
   const completedLessons = lessons.filter(letter => getLessonProgress(letter) > 0).length;
   const totalPercent = Math.round((completedLessons / lessons.length) * 100);
-
+console.log('All marks:', marks);
+  console.log('A marks:', marks.filter(m => m.letter === 'A'));
+  console.log('B marks:', marks.filter(m => m.letter === 'B'));
+  console.log('C marks:', marks.filter(m => m.letter === 'C'));
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.letterContainer}>
@@ -72,6 +74,8 @@ const Dashboard = () => {
           >
             <Text style={styles.btnText}>Back to Lessons</Text>
           </TouchableOpacity>
+          
+          
         </View>
       </View>
     </SafeAreaView>

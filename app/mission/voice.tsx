@@ -68,8 +68,8 @@ export default function Voice() {
   const scaleAnim = useRef(new Animated.Value(0)).current;
   const [isEraser, setIsEraser] = useState(false);
 
-  const { missions, setMissions } = useContext(MissionContext);
-  const { marks, addScore } = useMarks(); // <-- marks context
+  const { missions, setMissions, unlockNextMission } = useContext(MissionContext);
+  const { marks, addScore } = useMarks();
 
   const letterAudioPlayer = useAudioPlayer(letter ? soundMap[letter.toUpperCase()] : null);
   const successPlayer = useAudioPlayer(successSound);
@@ -146,20 +146,20 @@ export default function Voice() {
           await addScore(currentLetter, 'voice', 50); // give 50 points for voice
         }
 
-        // --- Update mission ---
+        // --- Complete voice mission ---
         const updatedMissions = [...missions];
-        updatedMissions.forEach(m => {
-          if (m.letter === currentLetter && m.mission === 'voice') m.completed = true;
-        });
+        const voiceMission = updatedMissions.find(m => m.letter === currentLetter && m.mission === 'voice');
+        if (voiceMission) {
+          voiceMission.completed = true;
+          console.log(`✅ Voice mission completed for letter ${currentLetter}`);
+        }
 
-        // Unlock next letter if draw+voice completed
+        // --- Check if both draw and voice are completed to unlock next letter ---
         const letterMissions = updatedMissions.filter(m => m.letter === currentLetter);
         const allCompleted = letterMissions.every(m => m.completed);
         if (allCompleted) {
-          const nextIndex = updatedMissions.findIndex(m => m.letter === currentLetter) + letterMissions.length;
-          if (nextIndex < updatedMissions.length && !updatedMissions[nextIndex].unlocked) {
-            updatedMissions[nextIndex].unlocked = true;
-          }
+          unlockNextMission(currentLetter);
+          console.log(`🎉 All missions completed for letter ${currentLetter}, next letter unlocked!`);
         }
 
         setMissions(updatedMissions);
