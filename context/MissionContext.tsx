@@ -5,7 +5,8 @@ import { createContext, ReactNode, useEffect, useState } from 'react';
 export type Mission = {
   id: string;
   letter: string;
-  completed: boolean; // true if the level (voice/draw) is completed
+  mission: 'draw' | 'voice';
+  completed: boolean; // true if the specific mission (draw/voice) is completed
   unlocked: boolean;  // true if user can play this mission
 };
 
@@ -14,6 +15,7 @@ export type MissionContextType = {
   setMissions: React.Dispatch<React.SetStateAction<Mission[]>>;
   completeMission: (id: string) => void;
   unlockNextMission: (letter: string) => void;
+  unlockVoiceMission: (letter: string) => void;
   resetMissions: () => void;
   isLoading: boolean;
 };
@@ -23,18 +25,34 @@ export const MissionContext = createContext<MissionContextType>({
   setMissions: () => {},
   completeMission: () => {},
   unlockNextMission: () => {},
+  unlockVoiceMission: () => {},
   resetMissions: () => {},
   isLoading: true,
 });
 
-// generate initial 26 missions (A-Z)
+// generate initial 52 missions (A-Z with draw and voice for each)
 const generateInitialMissions = (): Mission[] => {
-  return Array.from({ length: 26 }, (_, i) => ({
-    id: `m${i}`,
-    letter: String.fromCharCode(65 + i),
-    completed: false,
-    unlocked: i === 0, // only 'A' unlocked by default
-  }));
+  const missions: Mission[] = [];
+  for (let i = 0; i < 26; i++) {
+    const letter = String.fromCharCode(65 + i);
+    // Add draw mission
+    missions.push({
+      id: `${letter}-draw`,
+      letter,
+      mission: 'draw',
+      completed: false,
+      unlocked: i === 0, // only 'A' draw unlocked by default
+    });
+    // Add voice mission
+    missions.push({
+      id: `${letter}-voice`,
+      letter,
+      mission: 'voice',
+      completed: false,
+      unlocked: false, // voice missions unlock after draw is completed
+    });
+  }
+  return missions;
 };
 
 export const MissionProvider = ({ children }: { children: ReactNode }) => {
@@ -49,7 +67,7 @@ export const MissionProvider = ({ children }: { children: ReactNode }) => {
         const data = await AsyncStorage.getItem('missions');
         if (data) {
           const parsed: Mission[] = JSON.parse(data);
-          if (Array.isArray(parsed) && parsed.length === 26) {
+          if (Array.isArray(parsed) && parsed.length === 52) {
             setMissions(parsed);
           } else {
             setMissions(generateInitialMissions());
@@ -80,22 +98,46 @@ export const MissionProvider = ({ children }: { children: ReactNode }) => {
     );
   };
 
+  // unlock voice mission after draw is completed
+  const unlockVoiceMission = (letter: string) => {
+    const currentLetter = letter.toUpperCase();
+    
+    setMissions(prev => {
+      const newMissions = [...prev];
+      const voiceMission = newMissions.find(m => m.letter === currentLetter && m.mission === 'voice');
+      if (voiceMission && !voiceMission.unlocked) {
+        voiceMission.unlocked = true;
+        console.log(`🔓 Voice mission unlocked for letter ${currentLetter}`);
+      }
+      return newMissions;
+    });
+  };
+
   // unlock next mission if previous letter fully completed
   const unlockNextMission = (letter: string) => {
-    const index = missions.findIndex(m => m.letter === letter.toUpperCase());
-    if (index === -1) return;
-
+    const currentLetter = letter.toUpperCase();
+    
     // check if all missions of current letter completed
-    const currentLetterMissions = missions.filter(m => m.letter === letter.toUpperCase());
+    const currentLetterMissions = missions.filter(m => m.letter === currentLetter);
     const allCompleted = currentLetterMissions.every(m => m.completed);
 
     if (!allCompleted) return;
 
-    // unlock next mission if exists
-    if (index + 1 < missions.length && !missions[index + 1].unlocked) {
+    // find next letter
+    const currentLetterIndex = currentLetter.charCodeAt(0) - 65;
+    const nextLetterIndex = currentLetterIndex + 1;
+    
+    if (nextLetterIndex < 26) {
+      const nextLetter = String.fromCharCode(65 + nextLetterIndex);
+      
+      // unlock next letter's draw mission
       setMissions(prev => {
         const newMissions = [...prev];
-        newMissions[index + 1] = { ...newMissions[index + 1], unlocked: true };
+        const nextDrawMission = newMissions.find(m => m.letter === nextLetter && m.mission === 'draw');
+        if (nextDrawMission && !nextDrawMission.unlocked) {
+          nextDrawMission.unlocked = true;
+          console.log(`🎉 Next letter ${nextLetter} draw mission unlocked!`);
+        }
         return newMissions;
       });
     }
@@ -111,7 +153,7 @@ export const MissionProvider = ({ children }: { children: ReactNode }) => {
 
   return (
     <MissionContext.Provider
-      value={{ missions, setMissions, completeMission, unlockNextMission, resetMissions, isLoading }}
+      value={{ missions, setMissions, completeMission, unlockNextMission, unlockVoiceMission, resetMissions, isLoading }}
     >
       {children}
     </MissionContext.Provider>

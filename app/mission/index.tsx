@@ -76,7 +76,7 @@ const DrawingScreen = () => {
   const router = useRouter();
   const scaleAnim = useRef(new Animated.Value(0)).current;
 
-  const { missions, setMissions } = React.useContext(MissionContext);
+  const { missions, setMissions, unlockVoiceMission, unlockNextMission } = React.useContext(MissionContext);
   const { marks, addScore } = useMarks();
 
   const sucessAudio = useAudioPlayer(require("../../assets/sounds/success.wav"));
@@ -149,21 +149,26 @@ const DrawingScreen = () => {
             await addScore(upperLetter, 'draw', 50); // 50 points for draw
           }
 
-          // 2. Update MissionContext for draw
+          // 2. Complete draw mission
           const updatedMissions = [...missions];
-          updatedMissions.forEach(m => {
-            if (m.letter === upperLetter && m.mission === 'draw') m.completed = true;
-          });
+          const drawMission = updatedMissions.find(m => m.letter === upperLetter && m.mission === 'draw');
+          if (drawMission) {
+            drawMission.completed = true;
+            console.log(`✅ Draw mission completed for letter ${upperLetter}`);
+          }
 
-          // 3. Unlock next letter only if both draw + voice completed
+          // 3. Unlock voice mission for this letter
+          unlockVoiceMission(upperLetter);
+          console.log(`🔓 Voice mission unlocked for letter ${upperLetter}`);
+
+          // 4. Check if both draw and voice are completed to unlock next letter
           const letterMissions = updatedMissions.filter(m => m.letter === upperLetter);
           const allCompleted = letterMissions.every(m => m.completed);
           if (allCompleted) {
-            const nextIndex = updatedMissions.findIndex(m => m.letter === upperLetter) + letterMissions.length;
-            if (nextIndex < updatedMissions.length && !updatedMissions[nextIndex].unlocked) {
-              updatedMissions[nextIndex].unlocked = true;
-            }
+            unlockNextMission(upperLetter);
+            console.log(`🎉 All missions completed for letter ${upperLetter}, next letter unlocked!`);
           }
+
           setMissions(updatedMissions);
           await AsyncStorage.setItem('missions', JSON.stringify(updatedMissions));
 

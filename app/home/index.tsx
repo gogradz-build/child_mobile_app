@@ -13,7 +13,10 @@ const cat = require('../../assets/images/cat.png');
 const index = () => {
   const { missions, completeMission, isLoading } = useContext(MissionContext);
   const [localLoading, setLocalLoading] = useState(true);
-  const isUnlock = (index: number) => missions[index]?.unlocked;
+  const isUnlock = (letter: string) => {
+    const drawMission = missions.find(m => m.letter === letter && m.mission === 'draw');
+    return drawMission?.unlocked || false;
+  };
   const [notValidDisplay, setNotValidDisplay] = React.useState(false);
   const [mute,setMute] = React.useState(false);
 
@@ -142,7 +145,7 @@ const index = () => {
         numColumns={5}
         keyExtractor={(item) => item.id}
         renderItem={({ item, index }) => {
-          const unlocked = isUnlock(index);
+          const unlocked = isUnlock(item.letter);
 
           return (
             <TouchableOpacity
