@@ -1,0 +1,43 @@
+{
+  "format": "graph-model",
+  "generatedBy": "TensorFlow.js Converter v4.22.0",
+  "convertedBy": "TensorFlow.js Converter",
+  "modelTopology": {
+    "node": [
+      {
+        "name": "input",
+        "op": "Placeholder",
+        "attr": {
+          "dtype": {
+            "type": "DT_FLOAT"
+          },
+          "shape": {
+            "shape": {
+              "dim": [
+                {
+                  "size": "1"
+                },
+                {
+                  "size": "28"
+                },
+                {
+                  "size": "28"
+                },
+                {
+                  "size": "1"
+                }
+              ]
+            }
+          }
+        }
+      }
+    ],
+    "library": {}
+  },
+  "weightsManifest": [
+    {
+      "paths": ["weights.bin"],
+      "weights": []
+    }
+  ]
+}

@@ -2,7 +2,8 @@ import FooterButton from '@/components/FooterButton';
 import { MissionContext } from '@/context/MissionContext';
 import { useAudioPlayer } from "expo-audio";
 import { useRouter } from 'expo-router';
-import React, { useContext, useEffect, useState } from 'react';
+import * as React from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { FlatList, Image, Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import * as Animatable from 'react-native-animatable';
 
@@ -20,6 +21,8 @@ const index = () => {
   const homeAudioPlayer = useAudioPlayer(require("../../assets/sounds/alphabetsong.mp3"));
   const lockAudioPlayer = useAudioPlayer(require("../../assets/sounds/lock.wav"));
   const router = useRouter();
+
+  const [isEraser, setIsEraser] = useState(false);
 
   useEffect(() => {
     if (!isLoading && missions.length > 0) {
@@ -159,7 +162,8 @@ const index = () => {
         }}
       />
       <Image source={cat} />
-      <FooterButton setMute={setMute} mute={mute}/>
+      <FooterButton setMute={setMute} mute={mute} undo={()=>null}
+              clear={()=>null} isEraser={isEraser}/>
       <Modal visible={notValidDisplay} transparent={true} animationType="slide" >
         <View style={styles.modalBackground}>
           <View style={styles.modalContent}>
