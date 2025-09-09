@@ -79,8 +79,24 @@ const DrawingScreen = () => {
   const { missions, setMissions, unlockVoiceMission, unlockNextMission } = React.useContext(MissionContext);
   const { marks, addScore } = useMarks();
 
-  const sucessAudio = useAudioPlayer(require("../../assets/sounds/success.wav"));
+  const successAudio = useAudioPlayer(require("../../assets/sounds/success.wav"));
   const failAudio = useAudioPlayer(require("../../assets/sounds/fail.wav"));
+
+  const playSuccess = () => {
+    if (!mute) {
+      successAudio.pause();
+      successAudio.seekTo(0);
+      successAudio.play();
+    }
+  };
+
+  const playFail = () => {
+    if (!mute) {
+      failAudio.pause();
+      failAudio.seekTo(0);
+      failAudio.play();
+    }
+  };
 
   const colors = ["#000000", "#F59E0B", "#ED7E2D", "#10B981", "#3B82F6", "#8B5CF6", "#EF4444"];
 
@@ -143,39 +159,27 @@ const DrawingScreen = () => {
         const upperLetter = letter.toUpperCase();
 
         if (passed) {
-          // 1. Add draw marks if not already added
           const markEntry = marks.find(m => m.letter === upperLetter && m.mission === 'draw');
           if (!markEntry?.completed) {
-            await addScore(upperLetter, 'draw', 50); // 50 points for draw
+            await addScore(upperLetter, 'draw', 50);
           }
 
-          // 2. Complete draw mission
           const updatedMissions = [...missions];
           const drawMission = updatedMissions.find(m => m.letter === upperLetter && m.mission === 'draw');
-          if (drawMission) {
-            drawMission.completed = true;
-            console.log(`✅ Draw mission completed for letter ${upperLetter}`);
-          }
+          if (drawMission) drawMission.completed = true;
 
-          // 3. Unlock voice mission for this letter
           unlockVoiceMission(upperLetter);
-          console.log(`🔓 Voice mission unlocked for letter ${upperLetter}`);
 
-          // 4. Check if both draw and voice are completed to unlock next letter
           const letterMissions = updatedMissions.filter(m => m.letter === upperLetter);
-          const allCompleted = letterMissions.every(m => m.completed);
-          if (allCompleted) {
-            unlockNextMission(upperLetter);
-            console.log(`🎉 All missions completed for letter ${upperLetter}, next letter unlocked!`);
-          }
+          if (letterMissions.every(m => m.completed)) unlockNextMission(upperLetter);
 
           setMissions(updatedMissions);
           await AsyncStorage.setItem('missions', JSON.stringify(updatedMissions));
 
-          sucessAudio.play();
+          playSuccess();
           setTimeout(() => router.push({ pathname: "/mission/voice", params: { letter: upperLetter } }), 1500);
         } else {
-          failAudio.play();
+          playFail();
         }
       }
     } catch (error) {
