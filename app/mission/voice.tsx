@@ -189,7 +189,7 @@ export default function Voice() {
       </View>
 
       <TouchableOpacity style={styles.soundbttn} onPress={() => setPlay(!play)}>
-        <StaticIcon size={48} color="#000" />
+        <StaticIcon size={48} color="#e43535ff" />
       </TouchableOpacity>
 
       <View style={styles.padcontainer}>
