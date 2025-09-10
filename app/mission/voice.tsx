@@ -4,7 +4,6 @@ import FooterButton from '@/components/FooterButton';
 import { useMarks } from '@/context/MarksContext';
 import { MissionContext } from '@/context/MissionContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useAudioPlayer } from 'expo-audio';
 import { Audio } from 'expo-av';
 import * as FileSystem from 'expo-file-system';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -71,17 +70,59 @@ export default function Voice() {
   const { missions, setMissions, unlockNextMission } = useContext(MissionContext);
   const { marks, addScore } = useMarks();
 
-  const letterAudioPlayer = useAudioPlayer(letter ? soundMap[letter.toUpperCase()] : null);
-  const successPlayer = useAudioPlayer(successSound);
-  const failPlayer = useAudioPlayer(failSound);
+  // --- Sounds ---
+  const [letterSound, setLetterSound] = useState<Audio.Sound | null>(null);
+  const [successPlayer, setSuccessPlayer] = useState<Audio.Sound | null>(null);
+  const [failPlayer, setFailPlayer] = useState<Audio.Sound | null>(null);
+
+  // Load sounds
+  useEffect(() => {
+    let ls: Audio.Sound | null = null;
+    let sp: Audio.Sound | null = null;
+    let fp: Audio.Sound | null = null;
+
+    const load = async () => {
+      try {
+        if (letter) {
+          ls = new Audio.Sound();
+          await ls.loadAsync(soundMap[letter.toUpperCase()]);
+          setLetterSound(ls);
+        }
+        sp = new Audio.Sound();
+        fp = new Audio.Sound();
+        await sp.loadAsync(successSound);
+        await fp.loadAsync(failSound);
+        setSuccessPlayer(sp);
+        setFailPlayer(fp);
+      } catch (err) {
+        console.error("Error loading sounds", err);
+      }
+    };
+
+    load();
+
+    return () => {
+      ls?.unloadAsync();
+      sp?.unloadAsync();
+      fp?.unloadAsync();
+    };
+  }, [letter]);
 
   useEffect(() => {
-    if (play && letterAudioPlayer) {
-      letterAudioPlayer.seekTo(0);
-      letterAudioPlayer.play();
-      setPlay(false);
+    if (play && letterSound) {
+      (async () => {
+        try {
+          await letterSound.stopAsync();
+          await letterSound.setPositionAsync(0);
+          await letterSound.playAsync();
+        } catch (err) {
+          console.error("Error playing letter sound:", err);
+        } finally {
+          setPlay(false);
+        }
+      })();
     }
-  }, [play, letterAudioPlayer]);
+  }, [play, letterSound]);
 
   useEffect(() => {
     if (!result) scaleAnim.setValue(0);
@@ -131,36 +172,31 @@ export default function Voice() {
 
   const sendToModel = async (fileUri: string) => {
     try {
-      const success = Math.random() > 0.5; // mock
+      const success = Math.random() > 0.5; // mock result
 
       setResult({ passed: success });
       Animated.spring(scaleAnim, { toValue: 1, useNativeDriver: true }).start();
 
       if (success) {
-        successPlayer.play();
+        if (!mute && successPlayer) {
+          await successPlayer.stopAsync();
+          await successPlayer.setPositionAsync(0);
+          await successPlayer.playAsync();
+        }
 
-        // --- Add marks for voice ---
         const currentLetter = letter!.toUpperCase();
         const markEntry = marks.find(m => m.letter === currentLetter && m.mission === 'voice');
         if (!markEntry?.completed) {
-          await addScore(currentLetter, 'voice', 50); // give 50 points for voice
+          await addScore(currentLetter, 'voice', 50);
         }
 
-        // --- Complete voice mission ---
         const updatedMissions = [...missions];
         const voiceMission = updatedMissions.find(m => m.letter === currentLetter && m.mission === 'voice');
-        if (voiceMission) {
-          voiceMission.completed = true;
-          console.log(`✅ Voice mission completed for letter ${currentLetter}`);
-        }
+        if (voiceMission) voiceMission.completed = true;
 
-        // --- Check if both draw and voice are completed to unlock next letter ---
         const letterMissions = updatedMissions.filter(m => m.letter === currentLetter);
         const allCompleted = letterMissions.every(m => m.completed);
-        if (allCompleted) {
-          unlockNextMission(currentLetter);
-          console.log(`🎉 All missions completed for letter ${currentLetter}, next letter unlocked!`);
-        }
+        if (allCompleted) unlockNextMission(currentLetter);
 
         setMissions(updatedMissions);
         await AsyncStorage.setItem('missions', JSON.stringify(updatedMissions));
@@ -170,7 +206,11 @@ export default function Voice() {
           router.push("/dashboard");
         }, 1500);
       } else {
-        failPlayer.play();
+        if (!mute && failPlayer) {
+          await failPlayer.stopAsync();
+          await failPlayer.setPositionAsync(0);
+          await failPlayer.playAsync();
+        }
         popupTimer.current = setTimeout(() => setResult(null), 1500);
       }
     } catch (err) {

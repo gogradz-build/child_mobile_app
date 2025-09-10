@@ -24,7 +24,6 @@
     "@tensorflow/tfjs-react-native": "^1.0.0",
     "@tensorflow/tfjs-tflite": "^0.0.1-alpha.10",
     "expo": "~53.0.20",
-    "expo-audio": "~0.4.8",
     "expo-av": "~15.1.7",
     "expo-blur": "~14.1.5",
     "expo-camera": "^16.1.11",
