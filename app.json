@@ -40,8 +40,7 @@
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
         }
-      ],
-      "expo-audio"
+      ]
     ],
     "experiments": {
       "typedRoutes": true
@@ -49,6 +48,9 @@
     "extra": {
       "router": {
         "origin": false
+      },
+      "eas": {
+        "projectId": "5ad3b71f-c4b7-4b6b-a529-61839bf71159"
       }
     },
     "platforms": [

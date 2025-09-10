@@ -4,7 +4,7 @@ import { MissionContext } from '@/context/MissionContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as tf from '@tensorflow/tfjs';
 import '@tensorflow/tfjs-react-native';
-import { useAudioPlayer } from 'expo-audio';
+import { Audio } from "expo-av";
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import * as React from 'react';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -75,28 +75,62 @@ const DrawingScreen = () => {
   const currentStroke = useRef<Stroke | null>(null);
   const router = useRouter();
   const scaleAnim = useRef(new Animated.Value(0)).current;
-
+  const [successSound, setSuccessSound] = useState<Audio.Sound | null>(null);
+  const [failSound, setFailSound] = useState<Audio.Sound | null>(null);
+  
   const { missions, setMissions, unlockVoiceMission, unlockNextMission } = React.useContext(MissionContext);
   const { marks, addScore } = useMarks();
 
-  const successAudio = useAudioPlayer(require("../../assets/sounds/success.wav"));
-  const failAudio = useAudioPlayer(require("../../assets/sounds/fail.wav"));
+   useEffect(() => {
+    let success: Audio.Sound | null = null;
+    let fail: Audio.Sound | null = null;
 
-  const playSuccess = () => {
-    if (!mute) {
-      successAudio.pause();
-      successAudio.seekTo(0);
-      successAudio.play();
+    const loadSounds = async () => {
+      try {
+        success = new Audio.Sound();
+        fail = new Audio.Sound();
+        await success.loadAsync(require("../../assets/sounds/success.wav"));
+        await fail.loadAsync(require("../../assets/sounds/fail.wav"));
+        setSuccessSound(success);
+        setFailSound(fail);
+      } catch (error) {
+        console.error("Error loading sounds:", error);
+      }
+    };
+
+    loadSounds();
+
+    return () => {
+      success?.unloadAsync();
+      fail?.unloadAsync();
+    };
+  }, []);
+
+  const playSuccess = async () => {
+    if (!mute && successSound) {
+      try {
+        await successSound.stopAsync();
+        await successSound.setPositionAsync(0);
+        await successSound.playAsync();
+      } catch (error) {
+        console.warn("Error playing success sound:", error);
+      }
     }
   };
 
-  const playFail = () => {
-    if (!mute) {
-      failAudio.pause();
-      failAudio.seekTo(0);
-      failAudio.play();
+  const playFail = async () => {
+    if (!mute && failSound) {
+      try {
+        await failSound.stopAsync();
+        await failSound.setPositionAsync(0);
+        await failSound.playAsync();
+      } catch (error) {
+        console.warn("Error playing fail sound:", error);
+      }
     }
   };
+
+
 
   const colors = ["#000000", "#F59E0B", "#ED7E2D", "#10B981", "#3B82F6", "#8B5CF6", "#EF4444"];
 
