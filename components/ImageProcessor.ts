@@ -1,4 +1,3 @@
-// imageProcessor.ts
 import * as tf from '@tensorflow/tfjs';
 
 export interface ProcessedImage {
@@ -9,7 +8,7 @@ export interface ProcessedImage {
 
 export class ImageProcessor {
   
-  // Process base64 image to tensor for letter recognition model
+ 
   static async processBase64ToTensor(
     base64Image: string,
     targetSize: number = 28,

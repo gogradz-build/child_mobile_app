@@ -1,8 +1,3 @@
-// tfliteModel.ts
-
-// You'll need to install: npm install react-native-tflite
-// For Expo managed workflow, you might need to eject or use a custom development build
-// Alternative: use @tensorflow/tfjs-react-native with converted models
 
 export interface TFLiteResult {
   letter: string;
@@ -11,10 +6,10 @@ export interface TFLiteResult {
 }
 
 export interface ModelConfig {
-  inputSize: number; // 28 for MNIST-like models
-  numClasses: number; // 26 for A-Z letters
-  mean: number; // normalization mean (usually 0 or 127.5)
-  std: number; // normalization std (usually 1 or 127.5)
+  inputSize: number; 
+  numClasses: number; 
+  mean: number; 
+  std: number; 
 }
 
 class TFLiteModelHandler {
@@ -29,12 +24,7 @@ class TFLiteModelHandler {
   // For React Native TFLite package (if you can use it)
   async loadTFLiteModel(modelPath: string): Promise<boolean> {
     try {
-      // This would work with react-native-tflite
-      // const TFLite = require('react-native-tflite');
-      // this.model = await TFLite.loadModel(modelPath);
-      // return true;
-      
-      // Since you're using Expo, we'll create a mock for now
+     
       console.log(`Loading TFLite model from: ${modelPath}`);
       this.model = this.createMockModel();
       return true;
@@ -44,7 +34,7 @@ class TFLiteModelHandler {
     }
   }
 
-  // Alternative: Convert TFLite to TensorFlow.js format
+  
   async loadConvertedModel(modelUrl: string): Promise<boolean> {
     try {
       const tf = require('@tensorflow/tfjs');
@@ -72,8 +62,7 @@ class TFLiteModelHandler {
       // 4. Normalize pixels
       // 5. Reshape to [1, 28, 28, 1]
       
-      // For now, creating a mock tensor
-      // Replace this with actual image processing
+      
       const tensor = tf.randomNormal([1, this.modelConfig.inputSize, this.modelConfig.inputSize, 1]);
       return tensor;
     } catch (error) {
@@ -82,7 +71,7 @@ class TFLiteModelHandler {
     }
   }
 
-  // Run prediction
+  
   async predict(base64Image: string): Promise<TFLiteResult> {
     if (!this.model) {
       throw new Error('Model not loaded');
@@ -127,9 +116,9 @@ class TFLiteModelHandler {
         // Simulate letter recognition probabilities
         const probabilities = new Array(26).fill(0).map(() => Math.random() * 0.1);
         
-        // Give higher probability to a random letter (for testing)
+        
         const randomIndex = Math.floor(Math.random() * 26);
-        probabilities[randomIndex] = Math.random() * 0.3 + 0.6; // 0.6-0.9 range
+        probabilities[randomIndex] = Math.random() * 0.3 + 0.6; 
         
         return {
           data: () => Promise.resolve(probabilities),
